@@ -138,6 +138,30 @@ describe('npmAdapter', () => {
           expect(runCount).to.equal(1, 'Only yarn install should run with manager options');
         });
       });
+
+      it('uses --pure-lockfile from managerOptions to ignore --no-lockfile', () => {
+        writeJSONFile('package.json', fixturePackage);
+        let runCount = 0;
+        let stubbedRun = generateMockRun([{
+          command: 'yarn install --pure-lockfile --ignore-engines',
+          callback(command, args, opts) {
+            runCount++;
+
+            expect(args.indexOf('--no-lockfile') === -1).to.be.true
+            expect(args.includes('--pure-lockfile')).to.be.true
+            return RSVP.resolve();
+          },
+        }], { allowPassthrough: false });
+
+        return new NpmAdapter({
+          cwd: tmpdir,
+          run: stubbedRun,
+          useYarnCommand: true,
+          managerOptions: ['--pure-lockfile'],
+        })._install().then(() => {
+          expect(runCount).to.equal(1, 'Only yarn install should run with manager options');
+        });
+      });
     });
   });
 
