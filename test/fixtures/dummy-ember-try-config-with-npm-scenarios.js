@@ -1,5 +1,6 @@
 module.exports = {
   useYarn: true,
+  useLockfile: true,
   scenarios: [
     {
       name: 'test1',
